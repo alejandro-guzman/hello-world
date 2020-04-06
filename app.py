@@ -18,7 +18,7 @@ def health():
 
 @app.route('/version')
 def version():
-    return jsonify({'message': '', 'vesion': const['version']})
+    return jsonify({'message': '', 'version': const['version']})
 
 def main():
     app.run(
