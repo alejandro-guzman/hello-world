@@ -16,4 +16,5 @@ RUN rm -rf /tmp/dist
 
 ARG version
 ENV VERSION=$version
+
 ENTRYPOINT ["hello-world"]
