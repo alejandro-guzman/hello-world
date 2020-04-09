@@ -48,10 +48,9 @@ class VersionResponseSchema(Schema):
 class Echo():
     def __init__(self, echo, **kwargs):
         self.echo = f'Hello there, {echo}!'
-        self.echo_at = datetime.datetime.now()
+        self.echo_at = kwargs.get('echo_at', datetime.datetime.now())
 
 class EchoSchema(Schema):
-    _id = fields.Inferred()
     echo = fields.Str(required=True)
     echo_at = fields.DateTime()
 
@@ -83,8 +82,12 @@ def echo():
     mschema = EchoSchema(many=True)
 
     echos = []
-    for echo in list(db.echos.find()):
-        echos.append(schema.load(echo))
+    for e in list(db.echos.find()):
+        _echo = {
+            'echo': e['echo'],
+            'echo_at': e['echo_at']
+        }
+        echos.append(schema.load(_echo))
     return jsonify(mschema.dump(echos))
 
 @app.route('/echo', methods=['POST'])
@@ -92,8 +95,7 @@ def add_echo():
     schema = EchoSchema()
     try:
         echo = schema.load(request.get_json())
-        echos = db.echos
-        echos.insert_one(schema.dump(echo))
+        db.echos.insert_one(schema.dump(echo))
     except mm_ex.ValidationError as e:
         return jsonify(e.messages), 400
     return jsonify(schema.dump(echo)), 201
