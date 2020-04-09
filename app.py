@@ -1,9 +1,15 @@
 import datetime
+import json
 
 from flask import Flask, jsonify, request
 from marshmallow import Schema, fields, post_load, exceptions as mm_ex
 
+from pymongo import MongoClient
+
 app = Flask(__name__)
+
+client = MongoClient('mongo')
+db = client['hello-world']
 
 const = {
     'host': '0.0.0.0',
@@ -11,7 +17,8 @@ const = {
     'version': 'v0.1.0'
 }
 
-echos = []
+# this breaks replicasets
+# echos = []
 
 class MessageResponse():
     def __init__(self, message=''):
@@ -39,11 +46,12 @@ class VersionResponseSchema(Schema):
     version = fields.Str()
 
 class Echo():
-    def __init__(self, echo):
+    def __init__(self, echo, **kwargs):
         self.echo = f'Hello there, {echo}!'
         self.echo_at = datetime.datetime.now()
 
 class EchoSchema(Schema):
+    _id = fields.Inferred()
     echo = fields.Str(required=True)
     echo_at = fields.DateTime()
 
@@ -71,16 +79,21 @@ def version():
 
 @app.route('/echo')
 def echo():
-    schema = EchoSchema(many=True)
-    resp = schema.dump(echos)
-    return jsonify(resp)
+    schema = EchoSchema()
+    mschema = EchoSchema(many=True)
+
+    echos = []
+    for echo in list(db.echos.find()):
+        echos.append(schema.load(echo))
+    return jsonify(mschema.dump(echos))
 
 @app.route('/echo', methods=['POST'])
 def add_echo():
     schema = EchoSchema()
     try:
         echo = schema.load(request.get_json())
-        echos.append(echo)
+        echos = db.echos
+        echos.insert_one(schema.dump(echo))
     except mm_ex.ValidationError as e:
         return jsonify(e.messages), 400
     return jsonify(schema.dump(echo)), 201
