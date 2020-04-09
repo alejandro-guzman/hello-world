@@ -11,6 +11,8 @@ const = {
     'version': 'v0.1.0'
 }
 
+echos = []
+
 class MessageResponse():
     def __init__(self, message=''):
         self.message = message
@@ -67,14 +69,21 @@ def version():
     version = VersionResponse(version=const['version'])
     return jsonify(schema.dump(version))
 
-@app.route('/echo', methods=['POST'])
+@app.route('/echo')
 def echo():
+    schema = EchoSchema(many=True)
+    resp = schema.dump(echos)
+    return jsonify(resp)
+
+@app.route('/echo', methods=['POST'])
+def add_echo():
     schema = EchoSchema()
     try:
         echo = schema.load(request.get_json())
+        echos.append(echo)
     except mm_ex.ValidationError as e:
         return jsonify(e.messages), 400
-    return jsonify(schema.dump(echo))
+    return jsonify(schema.dump(echo)), 201
 
 def main():
     app.run(
