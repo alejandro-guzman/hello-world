@@ -1,6 +1,7 @@
 import datetime
 import json
 import os
+import socket
 
 from flask import Flask, jsonify, request
 from marshmallow import Schema, fields, post_load, exceptions as mm_ex
@@ -26,13 +27,15 @@ class MessageResponseSchema(Schema):
     message = fields.Str()
 
 class HealthResponse():
-    def __init__(self, message='', status=200):
+    def __init__(self, message='', status=200, **kwargs):
         self.message = message
         self.status = status
+        self.hostname = socket.gethostname()
 
 class HealthResponseSchema(Schema):
     message = fields.Str()
     status = fields.Int()
+    hostname = fields.Str()
 
 class VersionResponse():
     def __init__(self, message='', version=''):

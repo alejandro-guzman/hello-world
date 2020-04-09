@@ -1,8 +1,19 @@
-FROM python:3.7
-WORKDIR /app
+FROM python:3.7-alpine AS builder
+
+WORKDIR /build
+
 COPY requirements.txt ./requirements.txt
-COPY app.py ./app.py
-RUN pip install -r requirements.txt
+COPY setup.py ./setup.py
+COPY helloworld/ ./helloworld
+
+RUN python setup.py bdist_wheel
+
+FROM python:3.7-alpine
+COPY --from=builder /build/dist /tmp/dist
+
+RUN pip install /tmp/dist/*
+RUN rm -rf /tmp/dist
+
 ARG version
 ENV VERSION=$version
-ENTRYPOINT ["python", "app.py"]
+ENTRYPOINT ["hello-world"]
