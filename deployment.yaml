@@ -2,23 +2,23 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   labels:
-    app: helloworld
-  name: helloworld
+    app: hello-world
+  name: hello-world
 spec:
   replicas: 3
   selector:
     matchLabels:
-      app: helloworld
+      app: hello-world
   strategy: {}
   template:
     metadata:
       labels:
-        app: helloworld
+        app: hello-world
     spec:
       containers:
       - image: "docker.io/alejandroguzman/helloworld:latest"
         imagePullPolicy: Always
-        name: helloworld
+        name: hello-world
         ports:
           - containerPort: 8080
         livenessProbe:
