@@ -1,5 +1,6 @@
 import datetime
 import json
+import os
 
 from flask import Flask, jsonify, request
 from marshmallow import Schema, fields, post_load, exceptions as mm_ex
@@ -8,13 +9,13 @@ from pymongo import MongoClient
 
 app = Flask(__name__)
 
-client = MongoClient('mongo')
+client = MongoClient(os.environ['MONGO_HOST'])
 db = client['hello-world']
 
 const = {
-    'host': '0.0.0.0',
-    'port': 8080,
-    'version': 'v0.1.0'
+    'host': os.environ.get('HOST', '0.0.0.0'),
+    'port': os.environ.get('PORT', 8080),
+    'version': os.environ.get('VERSION', 'unknown')
 }
 
 class MessageResponse():
