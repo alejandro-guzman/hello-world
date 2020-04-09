@@ -17,9 +17,6 @@ const = {
     'version': 'v0.1.0'
 }
 
-# this breaks replicasets
-# echos = []
-
 class MessageResponse():
     def __init__(self, message=''):
         self.message = message
