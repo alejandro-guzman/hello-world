@@ -6,12 +6,14 @@ COPY requirements.txt ./requirements.txt
 COPY setup.py ./setup.py
 COPY helloworld/ ./helloworld
 
+RUN pip install --upgrade pip setuptools wheel
+
 RUN python setup.py bdist_wheel
 
 FROM python:3.7-alpine
 COPY --from=builder /build/dist /tmp/dist
 
-RUN pip install /tmp/dist/*
+RUN pip install --compile /tmp/dist/*
 RUN rm -rf /tmp/dist
 
 ARG version
