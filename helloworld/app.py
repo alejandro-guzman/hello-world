@@ -12,7 +12,7 @@ app = Flask(__name__)
 const = {
     'host': os.environ.get('HOST', '0.0.0.0'),
     'port': os.environ.get('PORT', 8080),
-    'version': os.environ.get('VERSION', 'unknown')
+    'version': os.environ.get('VERSION') if os.environ.get('VERSION') else 'unknown'
 }
 
 class MessageResponse():
