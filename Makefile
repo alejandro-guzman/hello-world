@@ -12,5 +12,6 @@ build:
 run: build
 	docker container run --publish 8080:8080 helloworld:latest
 
-deploy:
-	minikube kubectl -- apply -f deploy/*
+mkdeploy:
+	kubectl apply -f service.yaml
+	kubectl apply -f deployment.yaml
