@@ -2,16 +2,12 @@ import datetime
 import json
 import os
 import socket
+import sys
 
 from flask import Flask, jsonify, request
 from marshmallow import Schema, fields, post_load, exceptions as mm_ex
 
-from pymongo import MongoClient
-
 app = Flask(__name__)
-
-client = MongoClient(os.environ['MONGO_HOST'])
-db = client['hello-world']
 
 const = {
     'host': os.environ.get('HOST', '0.0.0.0'),
@@ -46,19 +42,6 @@ class VersionResponseSchema(Schema):
     message = fields.Str()
     version = fields.Str()
 
-class Echo():
-    def __init__(self, echo, **kwargs):
-        self.echo = f'Hello there, {echo}!'
-        self.echo_at = kwargs.get('echo_at', datetime.datetime.now())
-
-class EchoSchema(Schema):
-    echo = fields.Str(required=True)
-    echo_at = fields.DateTime()
-
-    @post_load
-    def make_echo(self, data, **kwargs):
-        return Echo(**data)
-
 @app.route('/')
 def index():
     schema = MessageResponseSchema()
@@ -77,30 +60,6 @@ def version():
     version = VersionResponse(version=const['version'])
     return jsonify(schema.dump(version))
 
-@app.route('/echo')
-def echo():
-    schema = EchoSchema()
-    mschema = EchoSchema(many=True)
-
-    echos = []
-    for e in list(db.echos.find()):
-        _echo = {
-            'echo': e['echo'],
-            'echo_at': e['echo_at']
-        }
-        echos.append(schema.load(_echo))
-    return jsonify(mschema.dump(echos))
-
-@app.route('/echo', methods=['POST'])
-def add_echo():
-    schema = EchoSchema()
-    try:
-        echo = schema.load(request.get_json())
-        db.echos.insert_one(schema.dump(echo))
-    except mm_ex.ValidationError as e:
-        return jsonify(e.messages), 400
-    return jsonify(schema.dump(echo)), 201
-
 def main():
     app.run(
         host=const['host'],
@@ -109,4 +68,4 @@ def main():
     )
 
 if __name__ == '__main__':
-    exit(main())
+    sys.exit(main())
