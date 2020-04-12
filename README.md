@@ -4,9 +4,28 @@ Example flask application running in Kubernetes
 
 Find on [Dockerhub](https://hub.docker.com/r/alejandroguzman/helloworld)
 
-Apply Kubernetes manifests
+## Development
+
+Clone repo
 
 ```bash
-kubectl apply -f service.yaml
-kubectl apply -f deployment.yaml
+git clone git@github.com:alejandro-guzman/hello-world.git
+```
+
+Build docker image
+
+```bash
+make build
+```
+
+Run docker container
+
+```bash
+make run
+```
+
+Deploy to Kubernetes
+
+```bash
+make deploy
 ```
