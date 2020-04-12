@@ -23,5 +23,5 @@ setup(
     project_urls={
         'Source Code': 'https://github.com/alejandro-guzman/hello-world',
     },
-    python_requires='>={}'.format(project['py_version'])
+    python_requires='>=3.7'
 )

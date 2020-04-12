@@ -1,5 +1,4 @@
-ARG py_version
-FROM python:${py_version}-alpine AS builder
+FROM python:3.7-alpine AS builder
 
 WORKDIR /build
 
@@ -13,7 +12,7 @@ RUN pip install --upgrade pip setuptools wheel
 
 RUN python setup.py bdist_wheel
 
-FROM python:${py_version}-alpine
+FROM python:3.7-alpine
 COPY --from=builder /build/dist /tmp/dist
 
 RUN pip install --compile /tmp/dist/*
