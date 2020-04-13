@@ -12,3 +12,9 @@ run: build
 deploy:
 	kubectl apply -f service.yaml
 	kubectl apply -f deployment.yaml
+	kubectl apply -f hpa.yaml
+
+delete:
+	kubectl delete svc hello-world
+	kubectl delete deploy hello-world
+	kubectl delete hpa hello-world
